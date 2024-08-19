@@ -59,7 +59,7 @@ public:
 		ball->addForce(v * ball->getMass(), PxForceMode::eIMPULSE);
 	}
 
-	float SimulateToFindPeak()
+	float SimulateToFindPeak(float &Me)
 	{
 		float h = 0.0f;
 		float peak = 0.0f;
@@ -74,6 +74,7 @@ public:
 			peak = std::max(h, peak);
 		}
 		while (v.y > 0.0f);
+		Me = MechanicalEnergy(v, peak, ball->getMass());
 		return peak;
 	}
 
@@ -86,7 +87,7 @@ public:
 };
 
 
-void Experiment(bool correctForLag, bool impulse)
+void Experiment(bool correction, bool impulse)
 {
 	float tennisBallRadius = 0.068f; // 6.8cm
 	float tennisBallMass = 0.057f; // 57g
@@ -101,7 +102,7 @@ void Experiment(bool correctForLag, bool impulse)
 	std::cout.precision(2);
 
 	PxVec3 Eu(0);
-	if (correctForLag)
+	if (correction)
 	{
 		// calculate the required adjustment to the velocity to get it
 		// to what it would have needed to be, half a time step ago,
@@ -113,31 +114,30 @@ void Experiment(bool correctForLag, bool impulse)
 	{
 		test.CreateBall(tennisBallRadius, tennisBallMass, PxVec3(0));
 		test.HitBall(u + Eu);
-		std::cout << "Impulse energy is " << 0.5f * u.magnitudeSquared() * tennisBallMass << " J" << std::endl;
+		std::cout << "Impulse energy is " << test.MechanicalEnergy(u, 0.0f, tennisBallMass) << " J" << std::endl;
 	}
 	else
 	{
-		std::cout << "Initial energy is " << 0.5f * u.magnitudeSquared() * tennisBallMass << " J" << std::endl;
+		std::cout << "Initial energy is " << test.MechanicalEnergy(u, 0.0f, tennisBallMass) << " J" << std::endl;
 		test.CreateBall(tennisBallRadius, tennisBallMass, u + Eu);
 	}
 
-	float peak = test.SimulateToFindPeak();
-	Me = test.MechanicalEnergy(PxVec3(0), peak, tennisBallMass);
+float peak = test.SimulateToFindPeak(Me);
 	std::cout << "Ball mechanical energy " << Me << " J at peak height of " << peak << " m" << std::endl;
 	std::cout << std::endl;
 }
 
 int main()
 {
-	bool correctForLag = true;
+	bool correction = true;
 	bool impulse = true;
 	std::cout << "Test with initial velocity..." << std::endl;
-	Experiment(!correctForLag, !impulse);
+	Experiment(!correction, !impulse);
 	std::cout << "Test with impulse..." << std::endl;
-	Experiment(!correctForLag, impulse);
+	Experiment(!correction, impulse);
 	std::cout << "Apply correction to initial velocity..." << std::endl;
-	Experiment(correctForLag, !impulse);
+	Experiment(correction, !impulse);
 	std::cout << "Apply correction to impulse..." << std::endl;
-	Experiment(correctForLag, impulse);
+	Experiment(correction, impulse);
 	return 0;
 }
