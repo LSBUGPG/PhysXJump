@@ -164,7 +164,7 @@ void InitialVelocityJumpHeightExperiment(bool manualGravity)
 
 PxVec3 VectorFrom(PxRigidDynamic* a, PxRigidDynamic* b)
 {
-	return a->getGlobalPose().p - b->getGlobalPose().p;
+	return b->getGlobalPose().p - a->getGlobalPose().p;
 }
 
 float MeasureAphelionDrift(PxRigidDynamic* Earth, PxRigidDynamic* Sun, PhysicsTest& test, float orbits)
