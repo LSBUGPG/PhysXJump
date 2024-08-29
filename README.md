@@ -35,3 +35,57 @@ One nice feature of this correction is that it makes the effect of the impulse i
 ## Problems
 
 This correction depends on the internal implementation of the physics engine. It requires knowledge of all accelerations applied to the rigidbody before the update. If changes to the forces on the rigidbody are made in the same frame as the impulse, the adjustment would need to be different.
+
+## Potential fix
+
+This project contains two additional branches: `test-without-leapfrog-integration` and `test-leapfrog-integration`. These branches contain a modified version of the main branch test. They each contain the same code but different DLL's. These DLL's are from my fork of the current PhysX main branch: https://github.com/paulsinnett/PhysX and from a my own modified branch: https://github.com/paulsinnett/PhysX/tree/leapfrog-integration
+
+These modified tests, test both the built in gravity and manually applied gravity. And there is an additional test to check that a two body orbital simulation remains stable and measures the error compared to the measured properties of the Earth - Sun orbit.
+
+The `test-without-leapfrog-integration` produces this result:
+
+```
+Test initial velocity jump with built in gravity...
+Initial energy is 0.53 J
+Ball mechanical energy 0.5 J at peak height of 0.9 m
+
+Test impulse jump with built in gravity...
+Impulse energy is 0.53 J
+Ball mechanical energy 0.5 J at peak height of 0.9 m
+
+Test initial velocity jump with manual gravity...
+Initial energy is 0.53 J
+Ball mechanical energy 0.5 J at peak height of 0.9 m
+
+Test impulse jump with manual gravity...
+Impulse energy is 0.53 J
+Ball mechanical energy 0.5 J at peak height of 0.9 m
+
+Test orbit...
+Aphelion error is 0.036 AU after 100 orbits
+```
+
+The `test-leapfrog-integration` produces this result:
+
+```
+Test initial velocity jump with built in gravity...
+Initial energy is 0.53 J
+Ball mechanical energy 0.53 J at peak height of 0.94 m
+
+Test impulse jump with built in gravity...
+Impulse energy is 0.53 J
+Ball mechanical energy 0.53 J at peak height of 0.94 m
+
+Test initial velocity jump with manual gravity...
+Initial energy is 0.53 J
+Ball mechanical energy 0.53 J at peak height of 0.94 m
+
+Test impulse jump with manual gravity...
+Impulse energy is 0.53 J
+Ball mechanical energy 0.53 J at peak height of 0.94 m
+
+Test orbit...
+Aphelion error is 0.0045 AU after 100 orbits
+```
+
+This demonstrates that the leapfrog integration fix correctly applies impulses without losing energy, that it is stable in orbital simulation, and that the overal error is smaller than the original method.
