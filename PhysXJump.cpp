@@ -87,7 +87,7 @@ public:
 };
 
 
-void Experiment(bool correction, bool impulse)
+void Experiment(bool impulse)
 {
 	float tennisBallRadius = 0.068f; // 6.8cm
 	float tennisBallMass = 0.057f; // 57g
@@ -101,25 +101,16 @@ void Experiment(bool correction, bool impulse)
 	float Me = test.MechanicalEnergy(u, 0.0f, tennisBallMass);
 	std::cout.precision(2);
 
-	PxVec3 Eu(0);
-	if (correction)
-	{
-		// calculate the required adjustment to the velocity to get it
-		// to what it would have needed to be, half a time step ago,
-		// so that it is correct velocity when applied by updateForces()
-		Eu = -0.5f * gravity * dt;
-	}
-
 	if (impulse)
 	{
 		test.CreateBall(tennisBallRadius, tennisBallMass, PxVec3(0));
-		test.HitBall(u + Eu);
+		test.HitBall(u);
 		std::cout << "Impulse energy is " << test.MechanicalEnergy(u, 0.0f, tennisBallMass) << " J" << std::endl;
 	}
 	else
 	{
 		std::cout << "Initial energy is " << test.MechanicalEnergy(u, 0.0f, tennisBallMass) << " J" << std::endl;
-		test.CreateBall(tennisBallRadius, tennisBallMass, u + Eu);
+		test.CreateBall(tennisBallRadius, tennisBallMass, u);
 	}
 
 float peak = test.SimulateToFindPeak(Me);
@@ -129,15 +120,10 @@ float peak = test.SimulateToFindPeak(Me);
 
 int main()
 {
-	bool correction = true;
 	bool impulse = true;
 	std::cout << "Test with initial velocity..." << std::endl;
-	Experiment(!correction, !impulse);
+	Experiment(!impulse);
 	std::cout << "Test with impulse..." << std::endl;
-	Experiment(!correction, impulse);
-	std::cout << "Apply correction to initial velocity..." << std::endl;
-	Experiment(correction, !impulse);
-	std::cout << "Apply correction to impulse..." << std::endl;
-	Experiment(correction, impulse);
+	Experiment(impulse);
 	return 0;
 }
