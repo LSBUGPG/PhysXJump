@@ -28,7 +28,7 @@ This example shows that, simulating a tennis game, the errors would be large eno
 
 What does the correction do?
 
-Because PhysX uses Euler-Cromer simplectic integration, the velocity values lag the position values in time by half of the delta time interval. The correction calculates what the impulse force (or starting velocity) would have needed to be before the update so that the desired value is achieved at the point of the update.
+Because PhysX uses Euler-Cromer symplectic integration, the velocity values lag the position values in time by half of the delta time interval. The correction calculates what the impulse force (or starting velocity) would have needed to be before the update so that the desired value is achieved at the point of the update.
 
 One nice feature of this correction is that it makes the effect of the impulse independent of the delta time. Without this correction, changing the delta time changes the amount of energy lost during the first update frame and so the peak height of the ball.
 
@@ -38,7 +38,7 @@ This correction depends on the internal implementation of the physics engine. It
 
 ## Potential fix
 
-This project contains two additional branches: `test-without-leapfrog-integration` and `test-leapfrog-integration`. These branches contain a modified version of the main branch test. They each contain the same code but different DLL's. These DLL's are from my fork of the current PhysX main branch: https://github.com/paulsinnett/PhysX and from a my own modified branch: https://github.com/paulsinnett/PhysX/tree/leapfrog-integration
+This project contains two additional branches: `test-without-leapfrog-integration` and `test-leapfrog-integration`. These branches contain a modified version of the main branch test. They each contain the same code but different DLL's. These DLL's are from my fork of the current PhysX main branch: https://github.com/paulsinnett/PhysX and from my own modified branch: https://github.com/paulsinnett/PhysX/tree/leapfrog-integration
 
 These modified tests, test both the built in gravity and manually applied gravity. And there is an additional test to check that a two body orbital simulation remains stable and measures the error compared to the measured properties of the Earth - Sun orbit.
 
